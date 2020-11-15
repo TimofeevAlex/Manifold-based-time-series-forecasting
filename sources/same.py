@@ -1,8 +1,3 @@
-# coding: utf-8
-#
-# Nikita Puchkin
-# Structure-adaptive manifold estimator (SAME)
-
 import numpy as np
 from sklearn.metrics import pairwise_distances
 
