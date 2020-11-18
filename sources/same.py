@@ -1,13 +1,24 @@
 import numpy as np
 from sklearn.metrics import pairwise_distances
 
-
-# Y -- (n_samples x n_features)-array of noisy observations
-# n_neighbors_list -- a decreasing sequence of number of neighbors to use
-# tau -- threshold parameter, must be at most half of the reach of the manifold
-
 def SAME(Y, n_neighbors_list, tau):
+    '''
+    Performs manifold estimation by SAME
     
+    Parameters
+    ----------
+        Y : array-like 
+            A 2D array of noisy observations
+        n_neighbors_list : array-like
+            A 1D decreasing sequence of number of neighbors to use
+        tau : float
+            A threshold parameter, must be at most half of the reach of the manifold
+    
+    Returns
+    -------
+        X : array-like
+            A recovered projection of the observed points onto the manifold
+    '''
     # number of iterations
     n_iterations = n_neighbors_list.shape[0]
     # sample size

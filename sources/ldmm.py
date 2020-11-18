@@ -2,14 +2,11 @@ import numpy as np
 from numpy.linalg import solve
 from sklearn.metrics.pairwise import pairwise_distances
 
-# Auxiliary function
-#
-# One iteration in the LDMM algorithm
-#
-# Description of the parameters is given the function LDMM below
-
 def ldmm_iteration(X, Xt, rt, weights, h, lambd, mu, b):
-    
+    '''
+    Makes a step of LDMM algorithm. Please, have a look at the paper
+    for a better grasp.
+    '''
     n = Xt.shape[0]
     B = np.outer(np.ones(n), weights)
     
@@ -23,40 +20,38 @@ def ldmm_iteration(X, Xt, rt, weights, h, lambd, mu, b):
     
     # Update Xt, rt
     Xprev = Xt
-#     print(X)
-#     print(lambd * X)
-#     print(mu * (U + rt))
-#     print((lambd * X + mu * (U + rt)))
-#     print((lambd + mu))
     Xt = (lambd * X + mu * (U + rt)) / (lambd + mu)
-#     print(Xt)
     rt = rt + U - Xt
 
     return Xt, rt, Xprev
 
-
-
-# Low dimensional manifold model
-#
-# X -- (n_instances x n_features) point cloud
-#
-# weights -- (n_instances)-array of weights of the points
-#
-# h -- bandwidth
-#
-# lambd -- penalization parameter
-#
-# mu -- parameter in the Bregman iteration (it is better to take mu ~ n_instances * h)
-#
-# n_iterations -- number of iterations;
-#
-# eps -- accuracy; matters only if n_iterations=-1;
-# in this case the procedure repeats iterations until the difference will be less than eps
-#
-# RETURNS: X_recovered (n_instances x n_features) -- recovered projection
-# of the observed points onto the manifold
-
 def LDMM(X, lambd, mu, h=0.1, weights=None, n_iterations=-1, eps=1e-2, b=2):
+    '''
+    Performs manifold estimation by LDMM
+    
+    Parameters
+    ----------
+        X : array-like
+            Point cloud
+        weights : array-like
+            A 2D array of weights of the points
+        h : float
+            A kernel bandwidth
+        lambd : float
+            A penalization parameter
+        mu : float
+            A parameter in the Bregman iteration (it is better to take mu ~ n_instances * h)
+        n_iterations : int
+            A number of iterations
+        eps : float
+            An accuracy, matters only if n_iterations=-1, in this case the procedure 
+            repeats iterations until the difference will be less than eps
+
+    Returns
+    -------
+        Xt : array-like
+            A recovered projection of the observed points onto the manifold
+    '''
     
     n = X.shape[0]
     D = X.shape[1]
