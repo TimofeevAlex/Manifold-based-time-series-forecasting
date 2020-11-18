@@ -1,5 +1,6 @@
 import numpy as np
 from preprocessing import get_dataset
+from sklearn.preprocessing import normalize
 from ldmm import LDMM
 from same import SAME
 
