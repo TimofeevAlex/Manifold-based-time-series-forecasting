@@ -10,7 +10,7 @@ def loc_kernel(x):
     '''
     return 0.75 * np.maximum(1 - x**2, 0)
 
-def shifted_weighted_kNN(timestamps_train, timestamps_test, X_train, Y_train, X_test, n_neighbors, kernel=loc_kernel, lambd=0.05):
+def shifted_weighted_kNN(timestamps_train, timestamps_test, X_train, Y_train, X_test, n_neighbors, kernel=loc_kernel, tau=0.05):
     '''
     Makes predictions on the test dataset employing restored data by shifted weighted kNN method
     
@@ -31,8 +31,8 @@ def shifted_weighted_kNN(timestamps_train, timestamps_test, X_train, Y_train, X_
             it is treated as a equal number for all components
         kernel : function 
             A function satisfying kernel properties 
-        lambd : float
-            A rate of discounting historical data
+        tau : float
+            A time discount factor
         
     Returns
     -------
@@ -58,7 +58,7 @@ def shifted_weighted_kNN(timestamps_train, timestamps_test, X_train, Y_train, X_
         h = sorted_dist[n_neighbors[i]]
         weights = kernel(dist / h)
         # reweight by the time
-        weights = weights * np.exp(lambd * (timestamps_train - timestamps_test)) 
+        weights = weights * np.exp(tau * (timestamps_train - timestamps_test)) 
         # weighted kNN for the prediction
         Y_pred[i] = np.sum(Y_shifted[:, i] * weights) / np.sum(weights)
     
