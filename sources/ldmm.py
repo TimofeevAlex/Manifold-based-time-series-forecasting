@@ -2,40 +2,40 @@ import numpy as np
 from numpy.linalg import solve
 from sklearn.metrics.pairwise import pairwise_distances
 
-def ldmm_iteration(X, Xt, rt, weights, h, lambd, mu, b):
+def ldmm_iteration(Y, Yt, rt, weights, h_sqr, lambd, mu, b):
     '''
     Makes a step of LDMM algorithm. Please, have a look at the paper
     for a better grasp.
     '''
-    n = Xt.shape[0]
+    n = Yt.shape[0]
     B = np.outer(np.ones(n), weights)
     
-    Wt = np.exp(-0.25/h * pairwise_distances(Xt)**2) + b * np.identity(n)
+    Wt = np.exp(-0.25/h_sqr * pairwise_distances(Yt)**2) + b * np.identity(n)
     barWt = np.multiply(B, Wt)
     Dt = np.diag(np.sum(Wt, axis=1))
     Lt = Dt - Wt
     
-    Vt = Xt - rt
+    Vt = Yt - rt
     U = solve(Lt + mu * barWt, mu * np.matmul(barWt, Vt))
     
-    # Update Xt, rt
-    Xprev = Xt
-    Xt = (lambd * X + mu * (U + rt)) / (lambd + mu)
-    rt = rt + U - Xt
+    # Update Yt, rt
+    Yprev = Yt
+    Yt = (h_sqr * Y / lambd + mu * (U + rt)) / (h_sqr / lambd + mu)
+    rt = rt + U - Yt
 
-    return Xt, rt, Xprev
+    return Yt, rt, Yprev
 
-def LDMM(X, lambd, mu, h=0.1, weights=None, n_iterations=-1, eps=1e-2, b=2):
+def LDMM(Y, lambd, mu, h_sqr=0.1, weights=None, n_iterations=-1, eps=1e-2, b=2):
     '''
     Performs manifold estimation by LDMM
     
     Parameters
     ----------
-        X : array-like
+        Y : array-like
             Point cloud
         weights : array-like
             A 2D array of weights of the points
-        h : float
+        h_sqr : float
             A kernel bandwidth
         lambd : float
             A penalization parameter
@@ -49,29 +49,29 @@ def LDMM(X, lambd, mu, h=0.1, weights=None, n_iterations=-1, eps=1e-2, b=2):
 
     Returns
     -------
-        Xt : array-like
+        Yt : array-like
             A recovered projection of the observed points onto the manifold
     '''
     
-    n = X.shape[0]
-    D = X.shape[1]
+    n = Y.shape[0]
+    D = Y.shape[1]
     # Initialize weights
     if (weights is None):
         weights = np.ones(n)
     
     # Initial values
-    Xt = X
+    Yt = Y
     rt = np.zeros((n, D))
     # value on the previous step
-    Xprev = np.zeros((n, D))
+    Yprev = np.zeros((n, D))
 
     # LDMM cycle
     if (n_iterations == -1):
-        while (np.linalg.norm(Xt - Xprev) > eps):
-            Xt, rt, Xprev = ldmm_iteration(X, Xt, rt, weights, h, lambd, mu, b)
+        while (np.linalg.norm(Yt - Yprev) > eps):
+            Yt, rt, Yprev = ldmm_iteration(Y, Yt, rt, weights, h_sqr, lambd, mu, b)
     else:
         for t in range(n_iterations):
-            Xt, rt, Xprev = ldmm_iteration(X, Xt, rt, weights, h, lambd, mu, b)
+            Yt, rt, Yprev = ldmm_iteration(Y, Yt, rt, weights, h_sqr, lambd, mu, b)
             
 
-    return Xt
+    return Yt

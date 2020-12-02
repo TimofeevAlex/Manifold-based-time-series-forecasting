@@ -64,7 +64,7 @@ def shifted_weighted_kNN(timestamps_train, timestamps_test, X_train, Y_train, X_
     
     return Y_pred
 
-def predict_LDMM(timestamps_train, Y_train, timestamp_test, bandwidth, lambd, mu, h, n_iteration, n_neighbors, b=0):
+def predict_LDMM(timestamps_train, Y_train, timestamp_test, bandwidth, lambd, mu, h_sqr, n_iteration, n_neighbors, b=0):
     '''
     Makes predictions for data restored by LDMM
     
@@ -104,7 +104,7 @@ def predict_LDMM(timestamps_train, Y_train, timestamp_test, bandwidth, lambd, mu
     # Normalize the numerical features
     generalized_Y = normalize(generalized_Y)
     # Find a manifold
-    Z = LDMM(generalized_Y, lambd=lambd, mu=mu, h=h, n_iterations=n_iteration, b=b)  
+    Z = LDMM(generalized_Y, lambd=lambd, mu=mu, h_sqr=h_sqr, n_iterations=n_iteration, b=b)  
     # Define modified train and test features
     Z_train = Z[:-1, :]
     Z_test = Z[-1, :]
