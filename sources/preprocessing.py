@@ -23,6 +23,22 @@ def ts_to_vec(ts, bandwidth=12):
         
     return out
 
+
+def dao(ts):
+    '''
+    Algorithm that detects outliers and replace them with the average of
+    the two adjacent observations
+    '''
+    length = ts.shape[0]
+    for t in range(4, length - 3):
+        curr = np.abs(ts[t])
+        past_median = np.abs(np.median(ts[t - 3 : t]))
+        future_median = np.abs(np.median(ts[t + 1 : t + 4]))
+        if curr >= 4 * max(past_median, future_median):
+            ts[t] = 0.5 * (ts[t - 1] + ts[t + 1])
+    return ts
+
+
 def get_dataset(ts, bandwidth=12):
     '''
     Splits a times series represented as large-dimensional vectors
